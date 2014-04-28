@@ -14,7 +14,7 @@ def printNodeInfo(dataAsElement):
 def processBody(node):
     for child in node:
         if child.tag == "table":
-            processTableTest(child)
+            processTable(child)
             
 def processTable(node):
 
@@ -25,66 +25,23 @@ def processTable(node):
     
     thead = node.find("./thead")
     tbody = node.find("./tbody")
-    
-    # What about this:
-    # 1. Count number of child elements
-    # 2. Explicitly address those by their index
-    # 3. Do processing and apply remove to indexed child
-    #
-    # Current approach *might* mess up internal indexing
-    
-           
+                 
     rowCount = 0
     for child in node:
         if child.tag == "tr":
             if rowCount == 0:
                 # Add row to thead element
                 thead.append(child)
-                
-                # Remove row from parent node
-                #node.remove(child)
-                #processFirstRow(child)
-                
-                #sys.stderr.write("header row, row count =" + str(rowCount))
-                
+                              
             elif rowCount != 0:
                 # Add row to tbody element
-                tbody.append(child)
-                
-                # Remove row from parent node
-                #node.remove(child)
-                #processRow(child)
-                #node.insert(0, subnode)
-                
-                #sys.stderr.write("body row, row count =" + str(rowCount))
-                
+                tbody.append(child)               
             rowCount += 1
     
-    for child in node:
-        sys.stderr.write(child.tag + "\n")
-        
-        if child.tag == "tr":
-            node.remove(child)
-            sys.stderr.write("removed child \n")
-
-    for child in node:
-        sys.stderr.write(child.tag + "\n")
-
-def processTableTest(node):
-
-    for child in node:
-        sys.stderr.write(child.tag + "\n")
-        
-        if child.tag == "tr":
-            sys.stderr.write("removing child \n")
-            node.remove(child)
-    
-    sys.stderr.write("---------------------\n")
-
-    for child in node:
-        sys.stderr.write(child.tag + "\n")
-
-                              
+    # Remove all tr elements that are direct child of table element 
+    for tr in node.findall('tr'):
+        node.remove(tr)
+                             
 def processFirstRow(node):
     pass
 
@@ -93,6 +50,7 @@ def processRow(node):
     
 def main():
     fileIn = "tableIn.html"
+    #fileIn = "test.html"
     f = open(fileIn,"r")
     textData = f.read()
     f.close()
@@ -112,8 +70,6 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
 
 
 """
