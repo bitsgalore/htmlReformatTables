@@ -1,10 +1,15 @@
 #! /usr/bin/env python
 
+# Entity refs: &nbsp; &lsquo; &rsquo;
+
 import sys
 import os
 import imp
 import xml.etree.ElementTree as ET
 import re
+
+parser = ET.XMLParser()
+parser.entity["nbsp"] = unichr(160)
 
 def printNodeInfo(dataAsElement): 
     for node in dataAsElement.iter():
@@ -30,10 +35,14 @@ def processTable(node):
     for child in node:
         if child.tag == "tr":
             if rowCount == 0:
+                # Fix row contents
+                processFirstRow(child)
                 # Add row to thead element
                 thead.append(child)
                               
             elif rowCount != 0:
+                # Fix row contents
+                processRow(child)
                 # Add row to tbody element
                 tbody.append(child)               
             rowCount += 1
@@ -41,16 +50,26 @@ def processTable(node):
     # Remove all tr elements that are direct child of table element 
     for tr in node.findall('tr'):
         node.remove(tr)
-                             
+   
+                   
 def processFirstRow(node):
-    pass
-
+    for child in node.findall("td"):
+        child.tag = "th"
+        child.text = child[0][0].text
+        
+        for p in child.findall("p"):
+            child.remove(p)
+               
 def processRow(node):
-    pass
+    for child in node.findall("td"):
+        child.text = child[0][0].text
+        
+        for p in child.findall("p"):
+            child.remove(p)
     
 def main():
     fileIn = "tableIn.html"
-    #fileIn = "test.html"
+    #fileIn = "table2.html"
     f = open(fileIn,"r")
     textData = f.read()
     f.close()
